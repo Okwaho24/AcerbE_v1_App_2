@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AcerbE™ — Digital Fingerprinter</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg:       #080B10;
+    --surface:  #0D1117;
+    --panel:    #111720;
+    --border:   #1E2A38;
+    --accent:   #00E5FF;
+    --accent2:  #7B61FF;
+    --danger:   #FF3B5C;
+    --success:  #00F0A0;
+    --warn:     #FFB830;
+    --text:     #E8EDF2;
+    --muted:    #5A6A7A;
+    --mono:     'Space Mono', monospace;
+    --sans:     'Syne', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid scan line effect */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,229,255,0.012) 2px,
+      rgba(0,229,255,0.012) 4px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .logo-icon::before {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .logo-icon::after {
+    content: '';
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease-in-out infinite 0.3s;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+
+  .logo-text { font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
+  .logo-text span { color: var(--accent); }
+  .logo-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px; }
+
+  .status-bar {
+    display: flex; gap: 20px; align-items: center;
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+  }
+
+  .status-dot {
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+    animation: blink 3s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 90%, 100% { opacity: 1; }
+    95% { opacity: 0.2; }
+  }
+
+  /* ── LAYOUT ── */
+  .layout {
+    position: relative; z-index: 1;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: calc(100vh - 64px);
+  }
+
+  /* ── SIDEBAR ── */
+  nav {
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+
+  .nav-section {
+    padding: 0 1rem 1rem;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 1rem;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 1.5rem;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .nav-item:hover { color: var(--text); background: rgba(0,229,255,0.04); }
+
+  .nav-item.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(0,229,255,0.06);
+  }
+
+  .nav-icon { width: 16px; opacity: 0.7; flex-shrink: 0; }
+
+  /* ── MAIN ── */
+  main { padding: 2rem; overflow-y: auto; }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── STAT CARDS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .stat-card.cyan::before { background: var(--accent); }
+  .stat-card.purple::before { background: var(--accent2); }
+  .stat-card.green::before { background: var(--success); }
+  .stat-card.red::before { background: var(--danger); }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .stat-card.cyan .stat-value { color: var(--accent); }
+  .stat-card.purple .stat-value { color: var(--accent2); }
+  .stat-card.green .stat-value { color: var(--success); }
+  .stat-card.red .stat-value { color: var(--danger); }
+
+  .stat-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .section-title-accent { color: var(--accent); }
+
+  /* ── FORM CARD ── */
+  .form-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-full { grid-column: 1 / -1; }
+
+  label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  input[type="text"], input[type="email"], select, textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(0,229,255,0.12);
+  }
+
+  select { appearance: none; cursor: pointer; }
+  select option { background: var(--panel); }
+
+  .file-drop {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 2.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg);
+  }
+
+  .file-drop:hover, .file-drop.dragover {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.04);
+  }
+
+  .file-drop-icon {
+    width: 40px; height: 40px;
+    margin: 0 auto 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .file-drop-label {
+    font-size: 13px; color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .file-drop-label strong { color: var(--accent); font-weight: 400; }
+
+  input[type="file"] { display: none; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 22px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+
+  .btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid rgba(255,59,92,0.35);
+  }
+
+  .btn-danger:hover { background: rgba(255,59,92,0.1); }
+
+  .btn-row {
+    display: flex; gap: 10px; align-items: center;
+    margin-top: 1.5rem;
+  }
+
+  /* ── REGISTRY TABLE ── */
+  .table-wrap {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%; border-collapse: collapse;
+    font-family: var(--mono); font-size: 12px;
+  }
+
+  thead { background: var(--surface); }
+
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(30,42,56,0.6);
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(0,229,255,0.03); }
+
+  .td-id {
+    font-size: 10px;
+    color: var(--accent);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .badge-pdf    { background: rgba(255,184,48,0.15);  color: var(--warn); }
+  .badge-image  { background: rgba(0,229,255,0.12);   color: var(--accent); }
+  .badge-audio  { background: rgba(123,97,255,0.15);  color: var(--accent2); }
+  .badge-zip    { background: rgba(0,240,160,0.12);   color: var(--success); }
+  .badge-active { background: rgba(0,240,160,0.1);    color: var(--success); }
+  .badge-tamper { background: rgba(255,59,92,0.12);   color: var(--danger); }
+
+  /* ── RESULT PANEL ── */
+  .result-panel {
+    display: none;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    position: relative;
+  }
+
+  .result-panel.show { display: block; }
+  .result-panel.success { border-color: rgba(0,240,160,0.35); }
+  .result-panel.error   { border-color: rgba(255,59,92,0.35); }
+
+  .result-head {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+
+  .result-icon.ok  { background: rgba(0,240,160,0.12); }
+  .result-icon.err { background: rgba(255,59,92,0.12); }
+
+  .result-title { font-size: 15px; font-weight: 700; }
+  .result-subtitle { font-size: 12px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .result-field label { margin-bottom: 4px; font-size: 9px; }
+
+  .result-val {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    word-break: break-all;
+  }
+
+  .result-val.accent { color: var(--accent); }
+  .result-val.success { color: var(--success); }
+  .result-val.danger  { color: var(--danger); }
+
+  .copy-btn {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 12px; padding: 2px 6px;
+    border-radius: 4px; margin-left: 6px;
+    transition: color 0.1s;
+  }
+
+  .copy-btn:hover { color: var(--accent); }
+
+  /* ── SEARCH BAR ── */
+  .search-bar {
+    display: flex; gap: 10px; margin-bottom: 1rem;
+  }
+
+  .search-bar input { flex: 1; }
+
+  /* ── ACTIVITY FEED ── */
+  .activity-feed {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .feed-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(30,42,56,0.5);
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+
+  .feed-item:last-child { border-bottom: none; }
+
+  .feed-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 4px;
+  }
+
+  .feed-time { color: var(--muted); font-size: 10px; white-space: nowrap; }
+  .feed-msg  { color: var(--text); flex: 1; }
+  .feed-sub  { color: var(--muted); font-size: 10px; margin-top: 2px; }
+
+  /* ── SCAN RESULT IDENTITY ── */
+  .identity-card {
+    display: none;
+    background: var(--panel);
+    border: 1px solid rgba(0,240,160,0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .identity-card.show { display: block; }
+  .identity-card.tamper { border-color: rgba(255,59,92,0.4); }
+
+  .identity-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 1.5rem;
+  }
+
+  .id-avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(0,229,255,0.1);
+    border: 1.5px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800; color: var(--accent);
+    flex-shrink: 0;
+    font-family: var(--sans);
+  }
+
+  .id-name  { font-size: 18px; font-weight: 800; }
+  .id-email { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .id-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .id-field label { font-size: 9px; color: var(--muted); display: block; margin-bottom: 4px; font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase; }
+  .id-val { font-family: var(--mono); font-size: 12px; color: var(--text); }
+
+  /* ── LOADING ── */
+  .spinner {
+    display: none;
+    width: 20px; height: 20px;
+    border: 2px solid rgba(0,229,255,0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .spinner.show { display: inline-block; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    display: none; margin-top: 1rem;
+    background: var(--bg);
+    border-radius: 99px;
+    height: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .progress-wrap.show { display: block; }
+
+  .progress-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  /* ── FORMAT BARS ── */
+  .format-bars { margin-top: 1rem; }
+  .format-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px; font-size: 12px; font-family: var(--mono);
+  }
+  .format-name { width: 50px; color: var(--muted); font-size: 10px; text-transform: uppercase; }
+  .format-track { flex: 1; height: 6px; background: var(--bg); border-radius: 99px; overflow: hidden; }
+  .format-fill  { height: 100%; border-radius: 99px; transition: width 1s ease; }
+  .format-count { width: 30px; text-align: right; color: var(--text); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .empty-icon { font-size: 32px; margin-bottom: 12px; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .id-grid { grid-template-columns: repeat(2, 1fr); }
+    .result-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon"></div>
+    <div>
+      <div class="logo-text">Acer<span>bE</span>™</div>
+      <div class="logo-sub">Military-Grade Digital Fingerprinter · v1.0</div>
+    </div>
+  </div>
+  <div class="status-bar">
+    <div class="status-dot"><div class="dot"></div> System Online</div>
+    <span id="hdr-clock" style="letter-spacing:0.08em;"></span>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav>
+    <div class="nav-section">Operations</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('stamp')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 8a5 5 0 01-3.5-1.45A3.5 3.5 0 018 8.5a3.5 3.5 0 013.5 1.55A5 5 0 018 12z"/></svg>
+      Stamp Product
+    </div>
+    <div class="nav-item" onclick="showPage('scan')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M6 1a5 5 0 014.22 7.66l3.56 3.56-1.06 1.06-3.56-3.56A5 5 0 116 1zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg>
+      Forensic Scan
+    </div>
+    <div class="nav-section" style="margin-top:1rem;">Records</div>
+    <div class="nav-item" onclick="showPage('registry')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zm0 4h14v2H1zm0 4h14v2H1z"/></svg>
+      Registry
+    </div>
+    <div class="nav-section" style="margin-top:1rem;">System</div>
+    <div class="nav-item" onclick="showPage('docs')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M4 1h6l4 4v10H2V1h2zm6 0v4h4M5 8h6M5 11h6"/><rect x="2" y="1" width="12" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><line x1="5" y1="8" x2="11" y2="8" stroke="currentColor" stroke-width="1.2"/><line x1="5" y1="11" x2="11" y2="11" stroke="currentColor" stroke-width="1.2"/></svg>
+      Integration Docs
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main>
+
+    <!-- ── DASHBOARD PAGE ── -->
+    <div id="page-dashboard" class="page active">
+      <div class="stats-row">
+        <div class="stat-card cyan">
+          <div class="stat-label">Total Fingerprints</div>
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-sub">issued lifetime</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">Protected Products</div>
+          <div class="stat-value" id="stat-products">—</div>
+          <div class="stat-sub">unique product IDs</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Buyers Tracked</div>
+          <div class="stat-value" id="stat-buyers">—</div>
+          <div class="stat-sub">unique purchasers</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Tamper Events</div>
+          <div class="stat-value" id="stat-tamper">—</div>
+          <div class="stat-sub">detected violations</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+
+        <!-- Recent Activity -->
+        <div>
+          <div class="section-head">
+            <div class="section-title">Recent <span class="section-title-accent">Activity</span></div>
+          </div>
+          <div class="activity-feed" id="activity-feed">
+            <div class="empty-state"><div class="empty-icon">◎</div>No fingerprints issued yet.</div>
+          </div>
+        </div>
+
+        <!-- Format breakdown -->
+        <div>
+          <div class="section-head">
+            <div class="section-title">Format <span class="section-title-accent">Breakdown</span></div>
+          </div>
+          <div class="form-card" style="padding:1.5rem;">
+            <div class="format-bars" id="format-bars">
+              <div class="empty-state" style="padding:2rem 0;">No data yet.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── STAMP PAGE ── -->
+    <div id="page-stamp" class="page">
+      <div class="section-head" style="margin-bottom:1.5rem;">
+        <div class="section-title">Stamp <span class="section-title-accent">Product</span></div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);">Embed fingerprint at point of sale</div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-grid">
+          <div>
+            <label>Buyer Full Name *</label>
+            <input type="text" id="s-name" placeholder="Jane Smith">
+          </div>
+          <div>
+            <label>Buyer Email *</label>
+            <input type="email" id="s-email" placeholder="jane@example.com">
+          </div>
+          <div>
+            <label>Transaction ID *</label>
+            <input type="text" id="s-txid" placeholder="TX-2024-001" value="">
+          </div>
+          <div>
+            <label>Product ID *</label>
+            <input type="text" id="s-prodid" placeholder="PROD-EBOOK-001">
+          </div>
+          <div class="form-full">
+            <label>Product Name *</label>
+            <input type="text" id="s-prodname" placeholder="My Digital Product — Full Version">
+          </div>
+          <div>
+            <label>File Format</label>
+            <select id="s-format">
+              <option value="image">Image (PNG / JPG / WEBP)</option>
+              <option value="pdf">PDF Document</option>
+              <option value="audio">Audio (MP3 / WAV / FLAC)</option>
+              <option value="zip">ZIP Archive</option>
+            </select>
+          </div>
+          <div>
+            <label>Tamper Guard</label>
+            <select id="s-wrap">
+              <option value="yes">Enabled (AES-256 wrapper)</option>
+              <option value="no">Disabled (steganography only)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label>Product File</label>
+          <div class="file-drop" id="file-drop-zone" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input">
+            <div class="file-drop-icon">📁</div>
+            <div class="file-drop-label">
+              <strong>Click to select</strong> or drag & drop your product file<br>
+              <span style="font-size:10px;margin-top:4px;display:block;">PDF · PNG · JPG · MP3 · WAV · ZIP and more</span>
+            </div>
+            <div id="selected-file" style="margin-top:10px;font-size:11px;color:var(--accent);display:none;font-family:var(--mono);"></div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="simulateStamp()">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 8a5 5 0 01-3.5-1.45A3.5 3.5 0 018 8.5a3.5 3.5 0 013.5 1.55A5 5 0 018 12z"/></svg>
+            Stamp Fingerprint
+          </button>
+          <div class="spinner" id="stamp-spinner"></div>
+          <button class="btn btn-ghost" onclick="clearStampForm()">Clear</button>
+        </div>
+
+        <div class="progress-wrap" id="stamp-progress">
+          <div class="progress-bar" id="stamp-bar"></div>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div class="result-panel" id="stamp-result">
+        <div class="result-head">
+          <div class="result-icon ok">✓</div>
+          <div>
+            <div class="result-title">Fingerprint Issued Successfully</div>
+            <div class="result-subtitle" id="stamp-result-sub">—</div>
+          </div>
+        </div>
+        <div class="result-grid">
+          <div class="result-field">
+            <label>Fingerprint ID</label>
+            <div class="result-val accent" id="r-fpid">—</div>
+          </div>
+          <div class="result-field">
+            <label>Issued At (UTC)</label>
+            <div class="result-val" id="r-issued">—</div>
+          </div>
+          <div class="result-field">
+            <label>Buyer</label>
+            <div class="result-val" id="r-buyer">—</div>
+          </div>
+          <div class="result-field">
+            <label>Transaction ID</label>
+            <div class="result-val" id="r-tx">—</div>
+          </div>
+          <div class="result-field">
+            <label>Product</label>
+            <div class="result-val" id="r-prod">—</div>
+          </div>
+          <div class="result-field">
+            <label>Format</label>
+            <div class="result-val" id="r-fmt">—</div>
+          </div>
+          <div class="result-field" style="grid-column:1/-1">
+            <label>Buyer Key (hex) — Store Securely</label>
+            <div class="result-val" id="r-key" style="font-size:10px;word-break:break-all;color:var(--warn);">—</div>
+          </div>
+          <div class="result-field" style="grid-column:1/-1">
+            <label>Output File</label>
+            <div class="result-val success" id="r-outfile">—</div>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:1rem;">
+          <button class="btn btn-primary" onclick="downloadResult()">Download Stamped File</button>
+          <button class="btn btn-ghost" onclick="copyFpId()">Copy Fingerprint ID</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCAN PAGE ── -->
+    <div id="page-scan" class="page">
+      <div class="section-head" style="margin-bottom:1.5rem;">
+        <div class="section-title">Forensic <span class="section-title-accent">Scan</span></div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);">Identify owner of any suspected pirated file</div>
+      </div>
+
+      <div class="form-card">
+        <div style="margin-bottom:1rem;">
+          <label>Suspect File</label>
+          <div class="file-drop" id="scan-drop-zone" onclick="document.getElementById('scan-input').click()">
+            <input type="file" id="scan-input">
+            <div class="file-drop-icon">🔍</div>
+            <div class="file-drop-label">
+              <strong>Drop suspected pirated file here</strong><br>
+              <span style="font-size:10px;margin-top:4px;display:block;">Any format — PNG · JPG · PDF · MP3 · WAV · ZIP</span>
+            </div>
+            <div id="scan-selected" style="margin-top:10px;font-size:11px;color:var(--accent);display:none;font-family:var(--mono);"></div>
+          </div>
+        </div>
+
+        <div>
+          <label>Fingerprint ID (optional — speeds up scan)</label>
+          <input type="text" id="scan-fpid" placeholder="Leave blank to scan all registered fingerprints">
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="simulateScan()">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M6 1a5 5 0 014.22 7.66l3.56 3.56-1.06 1.06-3.56-3.56A5 5 0 116 1zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg>
+            Run Forensic Scan
+          </button>
+          <div class="spinner" id="scan-spinner"></div>
+        </div>
+
+        <div class="progress-wrap" id="scan-progress">
+          <div class="progress-bar" id="scan-bar"></div>
+        </div>
+      </div>
+
+      <div class="identity-card" id="identity-result">
+        <div class="identity-header">
+          <div class="id-avatar" id="id-avatar">?</div>
+          <div>
+            <div class="id-name" id="id-name">—</div>
+            <div class="id-email" id="id-email">—</div>
+            <div style="margin-top:8px;">
+              <span class="badge badge-active" id="id-status">IDENTIFIED</span>
+            </div>
+          </div>
+        </div>
+        <div class="id-grid">
+          <div class="id-field">
+            <label>Fingerprint ID</label>
+            <div class="id-val" id="id-fpid" style="color:var(--accent);font-size:10px;">—</div>
+          </div>
+          <div class="id-field">
+            <label>Transaction ID</label>
+            <div class="id-val" id="id-txid">—</div>
+          </div>
+          <div class="id-field">
+            <label>Product</label>
+            <div class="id-val" id="id-product">—</div>
+          </div>
+          <div class="id-field">
+            <label>Purchased At</label>
+            <div class="id-val" id="id-purchased">—</div>
+          </div>
+          <div class="id-field">
+            <label>File Format</label>
+            <div class="id-val" id="id-format">—</div>
+          </div>
+          <div class="id-field">
+            <label>Original Hash</label>
+            <div class="id-val" id="id-hash" style="font-size:10px;word-break:break-all;">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REGISTRY PAGE ── -->
+    <div id="page-registry" class="page">
+      <div class="section-head" style="margin-bottom:1rem;">
+        <div class="section-title">Fingerprint <span class="section-title-accent">Registry</span></div>
+        <button class="btn btn-ghost" style="font-size:11px;padding:7px 14px;" onclick="refreshRegistry()">Refresh</button>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" id="reg-search" placeholder="Search by buyer, product, transaction ID..." oninput="filterRegistry()">
+        <select id="reg-format-filter" onchange="filterRegistry()" style="width:140px;">
+          <option value="">All formats</option>
+          <option value="image">Image</option>
+          <option value="pdf">PDF</option>
+          <option value="audio">Audio</option>
+          <option value="zip">ZIP</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fingerprint ID</th>
+              <th>Buyer</th>
+              <th>Product</th>
+              <th>Format</th>
+              <th>Transaction</th>
+              <th>Issued At</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="registry-tbody">
+            <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">◎</div>No fingerprints yet. Stamp a product to get started.</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── DOCS PAGE ── -->
+    <div id="page-docs" class="page">
+      <div class="section-head" style="margin-bottom:1.5rem;">
+        <div class="section-title">Integration <span class="section-title-accent">Docs</span></div>
+      </div>
+
+      <div class="form-card" style="margin-bottom:1.5rem;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--accent);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.1em;">RaPaX™ Vending Machine — One-Line Integration</div>
+        <pre style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1.25rem;font-family:var(--mono);font-size:12px;color:var(--text);overflow-x:auto;line-height:1.7;"><span style="color:var(--muted)"># At checkout, after payment confirmed:</span>
+<span style="color:var(--accent2)">from</span> acerbe_integration <span style="color:var(--accent2)">import</span> acerbe_on_sale
+
+result = acerbe_on_sale(
+    product_file   = <span style="color:var(--success)">&quot;/products/my_ebook.pdf&quot;</span>,
+    buyer_name     = <span style="color:var(--success)">order.buyer_name</span>,
+    buyer_email    = <span style="color:var(--success)">order.buyer_email</span>,
+    transaction_id = <span style="color:var(--success)">order.id</span>,
+    product_id     = <span style="color:var(--success)">product.sku</span>,
+    product_name   = <span style="color:var(--success)">product.title</span>,
+)
+
+<span style="color:var(--muted)"># Deliver ONLY the stamped file — NEVER the original</span>
+<span style="color:var(--accent2)">if</span> result[<span style="color:var(--success)">&quot;success&quot;</span>]:
+    deliver_to_buyer(result[<span style="color:var(--success)">&quot;stamped_file&quot;</span>])</pre>
+      </div>
+
+      <div class="form-card" style="margin-bottom:1.5rem;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--accent);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.1em;">CLI — Stamp a product</div>
+        <pre style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1.25rem;font-family:var(--mono);font-size:12px;color:var(--text);overflow-x:auto;line-height:1.7;"><span style="color:var(--muted)"># Stamp at point of sale</span>
+python acerbe_cli.py stamp product.pdf output.pdf \
+  --buyer-name  <span style="color:var(--success)">&quot;Jane Smith&quot;</span> \
+  --buyer-email <span style="color:var(--success)">&quot;jane@example.com&quot;</span> \
+  --txid        <span style="color:var(--success)">&quot;TX-2024-001&quot;</span> \
+  --product-id  <span style="color:var(--success)">&quot;PROD-001&quot;</span> \
+  --product-name <span style="color:var(--success)">&quot;My Product&quot;</span>
+
+<span style="color:var(--muted)"># Forensic scan of suspected pirated file</span>
+python acerbe_cli.py scan suspected_copy.pdf
+
+<span style="color:var(--muted)"># Look up a fingerprint by ID</span>
+python acerbe_cli.py lookup &lt;fingerprint-id&gt;
+
+<span style="color:var(--muted)"># Show registry stats</span>
+python acerbe_cli.py stats</pre>
+      </div>
+
+      <div class="form-card">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--accent);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.1em;">Protection Layers</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div style="border:1px solid var(--border);border-radius:8px;padding:1rem;">
+            <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:6px;font-family:var(--mono);">LAYER 1 — STEGANOGRAPHY</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.7;">Format-specific invisible embedding. LSB pixel injection (images), XMP metadata (PDF), trailing bytes (audio), manifest + inner marking (ZIP). Undetectable to the naked eye or ear.</div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;padding:1rem;">
+            <div style="font-size:11px;font-weight:700;color:var(--accent2);margin-bottom:6px;font-family:var(--mono);">LAYER 2 — CRYPTO BINDING</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.7;">AES-256-CBC encryption with a PBKDF2-derived key unique to every buyer + transaction. Mathematically impossible for any two buyers to share a key.</div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;padding:1rem;">
+            <div style="font-size:11px;font-weight:700;color:var(--danger);margin-bottom:6px;font-family:var(--mono);">LAYER 3 — TAMPER GUARD</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.7;">HMAC-SHA256 wrapper over the full encrypted file. Any modification — even a single byte — invalidates the HMAC. Extraction produces a zero-byte unusable blob.</div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;padding:1rem;">
+            <div style="font-size:11px;font-weight:700;color:var(--success);margin-bottom:6px;font-family:var(--mono);">LAYER 4 — FORENSIC REGISTRY</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.7;">Every issued fingerprint logged to an encrypted local SQLite database with HMAC-sealed records. Buyer name, email, transaction ID, product, and timestamp — all tamper-evident.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let registryData = [];
+let lastStampResult = null;
+let selectedFile = null;
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+function uuid() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : r & 0x3 | 0x8).toString(16);
+  });
+}
+
+function genKey() {
+  const arr = new Uint8Array(32);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function sha256sim(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = Math.imul(31, h) + s.charCodeAt(i) | 0;
+  return Math.abs(h).toString(16).padStart(8,'0').repeat(8).slice(0,64);
+}
+
+function formatDate(d) {
+  return new Date(d).toLocaleString('en-US', {
+    month:'short', day:'numeric', year:'numeric',
+    hour:'2-digit', minute:'2-digit', second:'2-digit'
+  });
+}
+
+function initials(name) {
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+}
+
+// ── Clock ──────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('hdr-clock').textContent =
+    now.toUTCString().replace(' GMT','') + ' UTC';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── Navigation ─────────────────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (id === 'dashboard') refreshDashboard();
+  if (id === 'registry') refreshRegistry();
+}
+
+// ── File picker ────────────────────────────────────────────────────────────
+document.getElementById('file-input').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  selectedFile = f;
+  document.getElementById('selected-file').style.display = 'block';
+  document.getElementById('selected-file').textContent = '📄 ' + f.name + ' (' + (f.size/1024).toFixed(1) + ' KB)';
+});
+
+document.getElementById('scan-input').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  document.getElementById('scan-selected').style.display = 'block';
+  document.getElementById('scan-selected').textContent = '📄 ' + f.name + ' (' + (f.size/1024).toFixed(1) + ' KB)';
+});
+
+// Drag & drop
+['file-drop-zone','scan-drop-zone'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('dragover'); });
+  el.addEventListener('dragleave', () => el.classList.remove('dragover'));
+  el.addEventListener('drop', e => {
+    e.preventDefault(); el.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (!f) return;
+    if (id === 'file-drop-zone') {
+      selectedFile = f;
+      document.getElementById('selected-file').style.display = 'block';
+      document.getElementById('selected-file').textContent = '📄 ' + f.name + ' (' + (f.size/1024).toFixed(1) + ' KB)';
+    } else {
+      document.getElementById('scan-selected').style.display = 'block';
+      document.getElementById('scan-selected').textContent = '📄 ' + f.name + ' (' + (f.size/1024).toFixed(1) + ' KB)';
+    }
+  });
+});
+
+// ── STAMP simulation ───────────────────────────────────────────────────────
+async function simulateStamp() {
+  const name    = document.getElementById('s-name').value.trim();
+  const email   = document.getElementById('s-email').value.trim();
+  const txid    = document.getElementById('s-txid').value.trim();
+  const prodid  = document.getElementById('s-prodid').value.trim();
+  const prodname= document.getElementById('s-prodname').value.trim();
+  const fmt     = document.getElementById('s-format').value;
+
+  if (!name || !email || !txid || !prodid || !prodname) {
+    alert('Please fill in all required fields marked with *'); return;
+  }
+  if (!selectedFile) {
+    alert('Please select a product file to stamp.'); return;
+  }
+
+  const spinner  = document.getElementById('stamp-spinner');
+  const progress = document.getElementById('stamp-progress');
+  const bar      = document.getElementById('stamp-bar');
+  const result   = document.getElementById('stamp-result');
+
+  spinner.classList.add('show');
+  progress.classList.add('show');
+  result.classList.remove('show');
+  bar.style.width = '5%';
+
+  try {
+    // Step 1: Upload the file
+    bar.style.width = '20%';
+    const fileBytes = await selectedFile.arrayBuffer();
+    const uploadRes = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'X-Filename': selectedFile.name, 'Content-Type': 'application/octet-stream' },
+      body: fileBytes,
+    });
+    const uploadData = await uploadRes.json();
+    if (!uploadData.token) throw new Error('File upload failed.');
+
+    bar.style.width = '45%';
+
+    // Step 2: Stamp
+    const stampRes = await fetch('/api/stamp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        buyer_name: name, buyer_email: email,
+        transaction_id: txid, product_id: prodid,
+        product_name: prodname, file_token: uploadData.token,
+        tamper_wrap: document.getElementById('s-wrap').value === 'yes',
+      }),
+    });
+
+    bar.style.width = '85%';
+    const data = await stampRes.json();
+    bar.style.width = '100%';
+    spinner.classList.remove('show');
+
+    if (!data.success) throw new Error(data.reason || 'Stamp failed.');
+
+    lastStampResult = data;
+    const rec = {
+      fingerprint_id: data.fingerprint_id,
+      buyer_name: name, buyer_email: email,
+      transaction_id: txid, product_id: prodid,
+      product_name: prodname, file_format: fmt,
+      original_hash: data.original_hash,
+      issued_at: data.issued_at,
+    };
+    registryData.unshift(rec);
+    updateActivity(rec, 'stamp');
+
+    document.getElementById('r-fpid').textContent    = data.fingerprint_id;
+    document.getElementById('r-issued').textContent  = formatDate(data.issued_at);
+    document.getElementById('r-buyer').textContent   = name + ' <' + email + '>';
+    document.getElementById('r-tx').textContent      = txid;
+    document.getElementById('r-prod').textContent    = prodname + ' (' + prodid + ')';
+    document.getElementById('r-fmt').textContent     = fmt.toUpperCase();
+    document.getElementById('r-key').textContent     = data.buyer_key_hex;
+    document.getElementById('r-outfile').textContent = data.output_file;
+    document.getElementById('stamp-result-sub').textContent = 'Fingerprint ID: ' + data.fingerprint_id;
+    result.classList.add('show', 'success');
+    refreshDashboard();
+
+  } catch(err) {
+    spinner.classList.remove('show');
+    bar.style.width = '0%';
+    alert('Error: ' + err.message);
+  }
+}
+
+function clearStampForm() {
+  ['s-name','s-email','s-txid','s-prodid','s-prodname'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('selected-file').style.display = 'none';
+  document.getElementById('stamp-result').classList.remove('show');
+  document.getElementById('stamp-progress').classList.remove('show');
+  selectedFile = null;
+}
+
+function downloadResult() {
+  if (!lastStampResult) return;
+  if (lastStampResult.download_url) {
+    const a = document.createElement('a');
+    a.href = lastStampResult.download_url;
+    a.download = '';
+    a.click();
+  } else {
+    alert('No stamped file available to download.');
+  }
+}
+
+function copyFpId() {
+  const id = document.getElementById('r-fpid').textContent;
+  navigator.clipboard.writeText(id);
+}
+
+// ── SCAN simulation ────────────────────────────────────────────────────────
+async function simulateScan() {
+  const fpidHint = document.getElementById('scan-fpid').value.trim();
+  const scanFile = document.getElementById('scan-input').files[0];
+  const spinner  = document.getElementById('scan-spinner');
+  const progress = document.getElementById('scan-progress');
+  const bar      = document.getElementById('scan-bar');
+  const result   = document.getElementById('identity-result');
+
+  if (!scanFile) { alert('Please select a file to scan.'); return; }
+
+  spinner.classList.add('show');
+  progress.classList.add('show');
+  result.classList.remove('show','tamper');
+  bar.style.width = '10%';
+
+  try {
+    // Upload suspect file
+    const fileBytes = await scanFile.arrayBuffer();
+    const uploadRes = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'X-Filename': scanFile.name, 'Content-Type': 'application/octet-stream' },
+      body: fileBytes,
+    });
+    bar.style.width = '40%';
+    const uploadData = await uploadRes.json();
+    if (!uploadData.token) throw new Error('File upload failed.');
+
+    // Run forensic scan
+    const scanRes = await fetch('/api/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_token: uploadData.token, fingerprint_id: fpidHint || null }),
+    });
+    bar.style.width = '90%';
+    const data = await scanRes.json();
+    bar.style.width = '100%';
+    spinner.classList.remove('show');
+
+    if (data.identified) {
+      document.getElementById('id-avatar').textContent    = initials(data.buyer_name);
+      document.getElementById('id-name').textContent      = data.buyer_name;
+      document.getElementById('id-email').textContent     = data.buyer_email;
+      document.getElementById('id-fpid').textContent      = data.fingerprint_id;
+      document.getElementById('id-txid').textContent      = data.transaction_id;
+      document.getElementById('id-product').textContent   = data.product_name;
+      document.getElementById('id-purchased').textContent = formatDate(data.purchased_at);
+      document.getElementById('id-format').textContent    = (data.registry_record?.file_format||'').toUpperCase();
+      document.getElementById('id-hash').textContent      = data.registry_record?.original_hash || 'N/A';
+      document.getElementById('id-status').textContent    = 'IDENTIFIED';
+      document.getElementById('id-status').className      = 'badge badge-active';
+      result.classList.add('show');
+      updateActivity(data.registry_record, 'scan');
+    } else {
+      document.getElementById('id-avatar').textContent    = '?';
+      document.getElementById('id-name').textContent      = 'Unidentified File';
+      document.getElementById('id-email').textContent     = data.reason || 'No matching fingerprint found';
+      document.getElementById('id-fpid').textContent      = 'N/A';
+      document.getElementById('id-txid').textContent      = 'N/A';
+      document.getElementById('id-product').textContent   = 'Unknown';
+      document.getElementById('id-purchased').textContent = 'Unknown';
+      document.getElementById('id-format').textContent    = 'Unknown';
+      document.getElementById('id-hash').textContent      = 'N/A';
+      document.getElementById('id-status').textContent    = 'NOT IDENTIFIED';
+      document.getElementById('id-status').className      = 'badge badge-tamper';
+      result.classList.add('show','tamper');
+    }
+  } catch(err) {
+    spinner.classList.remove('show');
+    alert('Scan error: ' + err.message);
+  }
+}
+
+// ── Registry ───────────────────────────────────────────────────────────────
+function refreshRegistry() {
+  renderRegistry(registryData);
+}
+
+function renderRegistry(data) {
+  const tbody = document.getElementById('registry-tbody');
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">◎</div>No fingerprints issued yet.</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(r => `
+    <tr>
+      <td class="td-id" title="${r.fingerprint_id}">${r.fingerprint_id.slice(0,20)}…</td>
+      <td>
+        <div style="font-size:13px;">${r.buyer_name}</div>
+        <div style="font-size:10px;color:var(--muted);font-family:var(--mono);">${r.buyer_email}</div>
+      </td>
+      <td>
+        <div style="font-size:12px;">${r.product_name}</div>
+        <div style="font-size:10px;color:var(--muted);font-family:var(--mono);">${r.product_id || ''}</div>
+      </td>
+      <td><span class="badge badge-${r.file_format}">${r.file_format.toUpperCase()}</span></td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">${r.transaction_id}</td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap;">${formatDate(r.issued_at)}</td>
+      <td>
+        <button class="btn btn-ghost" style="padding:5px 10px;font-size:10px;" onclick="showLookup('${r.fingerprint_id}')">View</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterRegistry() {
+  const q   = document.getElementById('reg-search').value.toLowerCase();
+  const fmt = document.getElementById('reg-format-filter').value;
+  const filtered = registryData.filter(r => {
+    const matchQ = !q ||
+      r.buyer_name.toLowerCase().includes(q) ||
+      r.buyer_email.toLowerCase().includes(q) ||
+      r.product_name.toLowerCase().includes(q) ||
+      r.transaction_id.toLowerCase().includes(q) ||
+      r.fingerprint_id.toLowerCase().includes(q);
+    const matchF = !fmt || r.file_format === fmt;
+    return matchQ && matchF;
+  });
+  renderRegistry(filtered);
+}
+
+function showLookup(fpid) {
+  const r = registryData.find(x => x.fingerprint_id === fpid);
+  if (!r) return;
+  alert(
+    'FINGERPRINT RECORD\n' +
+    '──────────────────\n' +
+    'ID:          ' + r.fingerprint_id + '\n' +
+    'Buyer:       ' + r.buyer_name + '\n' +
+    'Email:       ' + r.buyer_email + '\n' +
+    'Transaction: ' + r.transaction_id + '\n' +
+    'Product:     ' + r.product_name + '\n' +
+    'Format:      ' + r.file_format + '\n' +
+    'Issued:      ' + formatDate(r.issued_at)
+  );
+}
+
+// ── Dashboard ──────────────────────────────────────────────────────────────
+let activityLog = [];
+
+function updateActivity(record, type) {
+  activityLog.unshift({ record, type, time: new Date().toISOString() });
+}
+
+async function refreshDashboard() {
+  // Pull live stats from server
+  try {
+    const [statsRes, regRes] = await Promise.all([
+      fetch('/api/stats'),
+      fetch('/api/registry?limit=200'),
+    ]);
+    const stats = await statsRes.json();
+    const reg   = await regRes.json();
+    if (Array.isArray(reg)) {
+      registryData = reg;
+    }
+    const total    = stats.total_fingerprints || registryData.length;
+    const products = [...new Set(registryData.map(r => r.product_id))].length;
+    const buyers   = [...new Set(registryData.map(r => r.buyer_email))].length;
+    document.getElementById('stat-total').textContent    = total;
+    document.getElementById('stat-products').textContent = products;
+    document.getElementById('stat-buyers').textContent   = buyers;
+    document.getElementById('stat-tamper').textContent   = stats.tamper_events || 0;
+  } catch(e) {
+    const total    = registryData.length;
+    const products = [...new Set(registryData.map(r => r.product_id))].length;
+    const buyers   = [...new Set(registryData.map(r => r.buyer_email))].length;
+    document.getElementById('stat-total').textContent    = total;
+    document.getElementById('stat-products').textContent = products;
+    document.getElementById('stat-buyers').textContent   = buyers;
+    document.getElementById('stat-tamper').textContent   = 0;
+
+  // Activity feed
+  const feed = document.getElementById('activity-feed');
+  if (!activityLog.length) {
+    feed.innerHTML = '<div class="empty-state"><div class="empty-icon">◎</div>No activity yet.</div>';
+  } else {
+    feed.innerHTML = activityLog.slice(0,12).map(a => {
+      const isStamp = a.type === 'stamp';
+      const color   = isStamp ? 'var(--accent)' : 'var(--success)';
+      const msg     = isStamp
+        ? `Fingerprint issued for <strong>${a.record.buyer_name}</strong>`
+        : `Forensic scan matched <strong>${a.record.buyer_name}</strong>`;
+      const sub = isStamp
+        ? `${a.record.product_name} · ${a.record.file_format.toUpperCase()}`
+        : `Product: ${a.record.product_name}`;
+      return `<div class="feed-item">
+        <div class="feed-dot" style="background:${color};box-shadow:0 0 6px ${color};"></div>
+        <div style="flex:1;">
+          <div class="feed-msg">${msg}</div>
+          <div class="feed-sub">${sub}</div>
+        </div>
+        <div class="feed-time">${formatDate(a.time).split(', ')[1]}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Format breakdown
+  const counts = {};
+  registryData.forEach(r => { counts[r.file_format] = (counts[r.file_format] || 0) + 1; });
+  const maxCount = Math.max(1, ...Object.values(counts));
+  const fmtColors = { image:'var(--accent)', pdf:'var(--warn)', audio:'var(--accent2)', zip:'var(--success)' };
+  const fmtBars   = document.getElementById('format-bars');
+
+  if (!total) {
+    fmtBars.innerHTML = '<div class="empty-state" style="padding:2rem 0;">No data yet.</div>';
+  } else {
+    fmtBars.innerHTML = ['image','pdf','audio','zip'].map(f => `
+      <div class="format-row">
+        <div class="format-name">${f}</div>
+        <div class="format-track">
+          <div class="format-fill" style="width:${((counts[f]||0)/maxCount)*100}%;background:${fmtColors[f]};"></div>
+        </div>
+        <div class="format-count">${counts[f]||0}</div>
+      </div>
+    `).join('');
+  }
+}
+
+// ── Auto-fill TX ID ────────────────────────────────────────────────────────
+document.getElementById('s-txid').value = 'TX-' + Date.now().toString(36).toUpperCase();
+
+// ── Init ───────────────────────────────────────────────────────────────────
+refreshDashboard();
+</script>
+</body>
+</html>
