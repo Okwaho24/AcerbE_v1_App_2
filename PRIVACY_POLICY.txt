@@ -1,0 +1,123 @@
+AcerbE™ Privacy Policy
+Archer Chain Analytics™
+Mahihkan.com
+CRA BN: 754975035 | GST/HST: 754975035 RT0001
+Saskatoon, Saskatchewan, Canada
+
+────────────────────────────────────────────────────────────
+1. SCOPE
+────────────────────────────────────────────────────────────
+This policy governs data handling within AcerbE™.
+
+AcerbE™ is a local-only software application.
+This policy applies to all versions and tiers of AcerbE™.
+
+────────────────────────────────────────────────────────────
+2. NO DATA COLLECTION
+────────────────────────────────────────────────────────────
+Archer Chain Analytics™ does not collect any data through
+AcerbE™.
+
+AcerbE™ does not:
+
+- Collect user data, usage data, or behavioral data.
+- Transmit any data to Archer Chain Analytics™ or any
+  third party.
+- Maintain any external database, server, or cloud service.
+- Record installation events, session data, or error logs
+  externally.
+
+────────────────────────────────────────────────────────────
+3. NO TELEMETRY
+────────────────────────────────────────────────────────────
+AcerbE™ contains no telemetry.
+
+No analytics, crash reporting, feature tracking, or usage
+monitoring is implemented.
+
+────────────────────────────────────────────────────────────
+4. NO EXTERNAL TRANSMISSION
+────────────────────────────────────────────────────────────
+AcerbE™ does not initiate any outbound network connection.
+
+All operations are executed locally on your system.
+All data remains on your system.
+
+────────────────────────────────────────────────────────────
+5. NO CLOUD DEPENDENCY
+────────────────────────────────────────────────────────────
+AcerbE™ requires no cloud account, cloud storage, or
+external API.
+
+AcerbE™ operates fully offline.
+Internet access is not required for any core function.
+
+────────────────────────────────────────────────────────────
+6. LOCAL DATA — YOUR RESPONSIBILITY
+────────────────────────────────────────────────────────────
+AcerbE™ stores the following locally on your system:
+
+- The Registry database (acerbe_registry.db) containing
+  fingerprint records, buyer identifiers, and transaction
+  references that you enter.
+- Stamped output files produced during your operations.
+- Temporary upload files cleared after processing.
+
+You are solely responsible for:
+
+- The security of all locally stored data.
+- Compliance with PIPEDA and applicable provincial
+  privacy legislation regarding any personal data you
+  enter into AcerbE™.
+- Lawful handling of buyer information stored in the
+  Registry.
+- Backup and recovery of Registry data.
+
+────────────────────────────────────────────────────────────
+7. BUYER DATA — OPERATOR OBLIGATION
+────────────────────────────────────────────────────────────
+If you use AcerbE™ to process buyer information (name,
+email, transaction ID), you are the data controller.
+
+Archer Chain Analytics™ is not the data controller for
+any buyer information you process using AcerbE™.
+
+You must:
+
+- Maintain a compliant privacy policy for your own buyers.
+- Obtain lawful basis for processing buyer personal data.
+- Respond to any data subject requests from your buyers.
+
+────────────────────────────────────────────────────────────
+8. THIRD-PARTY DEPENDENCIES
+────────────────────────────────────────────────────────────
+AcerbE™ uses the following open-source Python libraries,
+which operate locally and do not transmit data:
+
+- Pillow (image processing)
+- cryptography (AES-256, PBKDF2, HMAC)
+- pikepdf (PDF metadata)
+
+No third-party service accounts are required.
+No third-party APIs are called.
+
+────────────────────────────────────────────────────────────
+9. UPDATES TO THIS POLICY
+────────────────────────────────────────────────────────────
+Archer Chain Analytics™ may update this policy with new
+versions of AcerbE™.
+
+Updates will be distributed with the updated software
+package.
+
+────────────────────────────────────────────────────────────
+10. CONTACT
+────────────────────────────────────────────────────────────
+Archer Chain Analytics™
+Mahihkan.com
+Saskatoon, Saskatchewan, Canada
+
+────────────────────────────────────────────────────────────
+© Archer Chain Analytics™ — All Rights Reserved.
+Sovereign. Zero-Trust. Zero Compromise.
+────────────────────────────────────────────────────────────
