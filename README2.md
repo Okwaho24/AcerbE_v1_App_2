@@ -1,0 +1,167 @@
+# AcerbE™ — Digital Fingerprinter
+### Military-Grade Forensic Watermarking Engine · v1.0
+
+---
+
+## What It Does
+
+Embeds a **unique, buyer-specific, tamper-destructive digital fingerprint** into every
+product file at the moment of sale. If a buyer shares or resells your product, you can
+identify exactly who bought it, when, and via which transaction — by scanning any copy.
+
+---
+
+## Four Protection Layers
+
+| Layer | Method | Purpose |
+|-------|--------|---------|
+| 1 · Steganography | LSB pixel injection (images), XMP metadata (PDF), trailing bytes (audio), manifest + inner marking (ZIP) | Invisible embedding — undetectable to the eye/ear |
+| 2 · Crypto Binding | AES-256-CBC + PBKDF2-derived key, unique per buyer+transaction | No two buyers share a key. Mathematically unbreakable. |
+| 3 · Tamper Guard | HMAC-SHA256 wrapper over full encrypted content | Any modification = HMAC fail = zero-byte unusable output |
+| 4 · Forensic Registry | Encrypted SQLite DB with HMAC-sealed records | 100% traceable: name, email, transaction ID, timestamp |
+
+---
+
+## File Structure
+
+```
+acerbe_engine/
+├── acerbe_engine.py   ← Core engine (all 4 layers)
+├── acerbe_cli.py             ← Command-line interface
+├── acerbe_integration.py     ← RaPaX™ vending machine plug-in
+├── test_fingerprinter.py    ← Full test suite (8/8 pass)
+├── dashboard.html           ← Standalone web dashboard
+└── README.md                ← This file
+```
+
+---
+
+## Quick Start
+
+### Install dependencies
+```bash
+pip install Pillow pikepdf cryptography
+```
+
+### Set environment variables (production)
+```bash
+export ACERBE_MASTER_KEY="your-256-bit-secret-key-here"
+export ACERBE_REGISTRY_KEY="your-registry-hmac-key-here"
+export ACERBE_REGISTRY="/secure/path/to/acerbe_registry.db"
+```
+
+### Stamp a product at sale
+```bash
+python acerbe_cli.py stamp product.pdf output/ \
+  --buyer-name  "Jane Smith"         \
+  --buyer-email "jane@example.com"   \
+  --txid        "TX-2024-001"        \
+  --product-id  "PROD-EBOOK-001"     \
+  --product-name "My Digital Product"
+```
+
+### Forensic scan of a suspected pirated copy
+```bash
+python acerbe_cli.py scan suspected_copy.pdf
+```
+
+### List registry
+```bash
+python acerbe_cli.py list
+python acerbe_cli.py stats
+```
+
+---
+
+## RaPaX™ Integration (One Line)
+
+Drop this into your checkout handler. Call it after payment is confirmed.
+Deliver ONLY the `stamped_file` to the buyer — never the original.
+
+```python
+from acerbe_integration import acerbe_on_sale
+
+result = acerbe_on_sale(
+    product_file   = "/products/my_ebook.pdf",
+    buyer_name     = order.buyer_name,
+    buyer_email    = order.buyer_email,
+    transaction_id = order.id,
+    product_id     = product.sku,
+    product_name   = product.title,
+)
+
+if result["success"]:
+    deliver_to_buyer(result["stamped_file"])  # ← deliver THIS, never original
+    log_securely(result["buyer_key_hex"])      # ← store this for decryption
+```
+
+---
+
+## Python API
+
+```python
+import acerbe_engine as fp
+
+# Stamp
+result = fp.fingerprint_file(
+    src_path       = "product.pdf",
+    output_path    = "product_stamped.pdf",
+    buyer_name     = "Jane Smith",
+    buyer_email    = "jane@example.com",
+    transaction_id = "TX-001",
+    product_id     = "PROD-001",
+    product_name   = "My Product",
+    tamper_wrap    = True,  # wraps in .rpx encrypted container
+)
+
+# Forensic scan
+match = fp.identify_file("suspected_pirate_copy.pdf")
+if match["identified"]:
+    print(match["buyer_name"], match["buyer_email"])
+
+# Registry
+fp.get_registry_stats()
+fp.list_registry(limit=50)
+fp.registry.lookup("fingerprint-uuid-here")
+```
+
+---
+
+## Supported Formats
+
+| Format | Embedding Method |
+|--------|-----------------|
+| PNG / JPG / WEBP / BMP | LSB steganography across RGB channels |
+| PDF | XMP metadata + document info dictionary |
+| MP3 / WAV / FLAC / OGG | Trailing-byte injection (players ignore extra bytes) |
+| ZIP archives | Hidden `.acerbe_fp_manifest` + inner file marking |
+
+---
+
+## Security Notes
+
+1. **Master key** — set `ACERBE_MASTER_KEY` in environment. Never hardcode. Use a cryptographically random 256-bit value.
+2. **Registry key** — set `ACERBE_REGISTRY_KEY`. Used to HMAC-seal every registry record. Separate from master key.
+3. **Buyer keys** — each stamped file's decryption key is derived from master key + fingerprint ID + transaction ID. Log `buyer_key_hex` from each stamp result to a secure store.
+4. **Registry DB** — store `acerbe_registry.db` in a secure, backed-up location with restricted filesystem permissions (600).
+5. **Never deliver originals** — always deliver the `.rpx` stamped output, never the source file.
+
+---
+
+## Dashboard
+
+Open `dashboard.html` in any modern browser for the full visual interface:
+- Stamp products with form UI
+- Run forensic scans
+- Browse the registry
+- View stats and activity feed
+
+No server required — works entirely in-browser for the UI layer.
+The Python engine is invoked via CLI or API for actual file processing.
+
+---
+
+## License
+
+Proprietary — RaPaX™ Platform  
+© 2024 — All rights reserved
