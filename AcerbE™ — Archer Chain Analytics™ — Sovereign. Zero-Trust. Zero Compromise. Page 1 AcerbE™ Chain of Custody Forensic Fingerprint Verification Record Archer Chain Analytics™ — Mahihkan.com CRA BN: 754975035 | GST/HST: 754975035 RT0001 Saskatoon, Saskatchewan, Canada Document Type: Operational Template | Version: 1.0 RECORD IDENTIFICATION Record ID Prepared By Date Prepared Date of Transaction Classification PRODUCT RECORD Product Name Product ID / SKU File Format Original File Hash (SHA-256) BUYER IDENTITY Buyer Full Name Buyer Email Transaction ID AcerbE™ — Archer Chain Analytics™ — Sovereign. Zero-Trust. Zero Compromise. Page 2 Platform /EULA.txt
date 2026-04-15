@@ -1,0 +1,249 @@
+AcerbE™ End-User License Agreement (EULA)
+Archer Chain Analytics™
+Mahihkan.com
+CRA BN: 754975035 | GST/HST: 754975035 RT0001
+Saskatoon, Saskatchewan, Canada
+
+Effective upon installation or use of AcerbE™.
+This Agreement is a binding legal contract.
+
+────────────────────────────────────────────────────────────
+1. DEFINITIONS
+────────────────────────────────────────────────────────────
+"AcerbE™" means the AcerbE™ software, engine, dashboard,
+  scripts, documentation, and all associated files.
+
+"Archer Chain Analytics™" means Archer Chain Analytics™,
+  its principals, successors, and assigns.
+
+"You" or "Licensee" means the individual or entity that
+  has purchased, downloaded, or installed AcerbE™.
+
+"Fingerprint" means the unique cryptographic identifier
+  embedded into a digital product by AcerbE™.
+
+"Registry" means the local encrypted database maintained
+  by AcerbE™ recording all issued fingerprints.
+
+"Output" means any fingerprinted file, log, manifest,
+  or verification record produced by AcerbE™.
+
+────────────────────────────────────────────────────────────
+2. GRANT OF LICENSE
+────────────────────────────────────────────────────────────
+Subject to the terms of this Agreement, Archer Chain
+Analytics™ grants you a limited, non-exclusive,
+non-transferable, non-sublicensable license to:
+
+- Install AcerbE™ on systems you own or control.
+- Operate AcerbE™ for lawful fingerprinting, integrity
+  verification, and audit-logging of your own digital
+  products.
+- Generate Outputs for your internal operational use.
+
+This license does not convey ownership.
+No source code rights are granted.
+No rights beyond those explicitly stated are granted.
+
+────────────────────────────────────────────────────────────
+3. PROHIBITED USES
+────────────────────────────────────────────────────────────
+You may not:
+
+- Sell, sublicense, lease, rent, transfer, or distribute
+  AcerbE™ or any derivative work, in whole or in part.
+- Modify, adapt, translate, decompile, disassemble,
+  or reverse engineer AcerbE™.
+- Extract, replicate, or reproduce the fingerprinting logic,
+  encryption pipeline, or registry schema.
+- Remove, alter, or obscure any trademark, copyright notice,
+  fingerprint metadata, or integrity marker.
+- Use AcerbE™ to infringe, misappropriate, or circumvent
+  the intellectual property rights of any third party.
+- Use AcerbE™ for any unlawful, deceptive, fraudulent,
+  or harmful purpose.
+- Represent AcerbE™ Outputs as legal certifications,
+  court-admissible forensic evidence, or regulatory approvals
+  without independent legal verification.
+- Operate AcerbE™ on behalf of third parties as a service
+  without a separate written agreement with Archer Chain
+  Analytics™.
+
+────────────────────────────────────────────────────────────
+4. INTELLECTUAL PROPERTY
+────────────────────────────────────────────────────────────
+AcerbE™ — including its engine, fingerprinting pipeline,
+verification logic, manifest structure, dashboard, scripts,
+documentation, and all Outputs — is the exclusive
+intellectual property of Archer Chain Analytics™.
+
+Purchase grants a license only.
+No intellectual property rights are transferred.
+
+All trademarks — including AcerbE™, RaPaX™, and Archer
+Chain Analytics™ — are the exclusive property of Archer
+Chain Analytics™.
+
+────────────────────────────────────────────────────────────
+5. DATA HANDLING AND PRIVACY
+────────────────────────────────────────────────────────────
+AcerbE™ operates entirely locally.
+
+AcerbE™ does not:
+
+- Transmit data to any external server.
+- Collect telemetry, usage data, or analytics.
+- Maintain any cloud dependency.
+- Access, store, or process data outside your local system.
+
+You are solely responsible for:
+
+- Lawful collection and handling of buyer data entered into
+  AcerbE™.
+- Compliance with applicable privacy legislation including
+  PIPEDA and Saskatchewan privacy law.
+- Security of the Registry database and all Outputs.
+
+────────────────────────────────────────────────────────────
+6. COMPLIANCE OBLIGATIONS
+────────────────────────────────────────────────────────────
+You agree to comply with all applicable laws and regulations
+governing your use of AcerbE™, including but not limited to:
+
+- Privacy and data protection legislation.
+- Intellectual property law.
+- Consumer protection regulations.
+- Export control regulations.
+
+Archer Chain Analytics™ is not responsible for your
+compliance obligations.
+
+────────────────────────────────────────────────────────────
+7. AUDIT RIGHTS
+────────────────────────────────────────────────────────────
+Archer Chain Analytics™ reserves the right to audit your
+use of AcerbE™ for compliance with this Agreement upon
+reasonable written notice.
+
+You agree to cooperate with any such audit and to provide
+accurate information regarding your use.
+
+────────────────────────────────────────────────────────────
+8. NO WARRANTY
+────────────────────────────────────────────────────────────
+AcerbE™ is provided AS IS.
+
+Archer Chain Analytics™ makes no warranties — express,
+implied, or statutory.
+
+No guarantee is made regarding:
+
+- Fitness for purpose
+- Merchantability
+- Accuracy or completeness of Outputs
+- Detection of all tampering or corruption events
+- Uninterrupted operation
+
+────────────────────────────────────────────────────────────
+9. LIMITATION OF LIABILITY
+────────────────────────────────────────────────────────────
+To the fullest extent permitted by applicable law:
+
+Archer Chain Analytics™ is not liable for any direct,
+indirect, incidental, consequential, or special damages
+arising from the use, misuse, or inability to use AcerbE™.
+
+Total liability of Archer Chain Analytics™ under this
+Agreement shall not exceed the amount paid by you for
+AcerbE™ in the twelve (12) months preceding the claim.
+
+────────────────────────────────────────────────────────────
+10. INDEMNIFICATION
+────────────────────────────────────────────────────────────
+You agree to indemnify and hold harmless Archer Chain
+Analytics™ from any claims, damages, losses, or costs
+(including legal fees) arising from:
+
+- Your use or misuse of AcerbE™.
+- Your breach of this Agreement.
+- Your violation of any applicable law.
+- Your infringement of any third-party rights.
+
+────────────────────────────────────────────────────────────
+11. TERMINATION
+────────────────────────────────────────────────────────────
+This Agreement terminates immediately upon any breach.
+
+Upon termination:
+
+- All rights granted under this Agreement cease.
+- You must immediately cease all use of AcerbE™.
+- You must destroy all copies in your possession.
+
+Archer Chain Analytics™ reserves all legal remedies
+available under applicable law.
+
+────────────────────────────────────────────────────────────
+12. DISPUTE RESOLUTION
+────────────────────────────────────────────────────────────
+Any dispute arising under this Agreement shall be resolved
+as follows:
+
+Step 1 — Written Notice:
+  The disputing party delivers written notice specifying
+  the dispute in detail.
+
+Step 2 — Good Faith Negotiation:
+  Parties attempt resolution within thirty (30) days of
+  written notice.
+
+Step 3 — Arbitration:
+  Unresolved disputes shall be submitted to binding
+  arbitration in Saskatoon, Saskatchewan, under the
+  Arbitration Act (Saskatchewan).
+
+Step 4 — Litigation:
+  If arbitration is unavailable or unenforceable, disputes
+  shall be resolved exclusively in the courts of
+  Saskatchewan.
+
+You waive any right to jury trial.
+You waive any right to class action proceedings.
+
+────────────────────────────────────────────────────────────
+13. GOVERNING LAW AND JURISDICTION
+────────────────────────────────────────────────────────────
+This Agreement is governed by the laws of the Province of
+Saskatchewan and the federal laws of Canada applicable
+therein, without regard to conflict of law principles.
+
+────────────────────────────────────────────────────────────
+14. SEVERABILITY
+────────────────────────────────────────────────────────────
+If any provision of this Agreement is found unenforceable,
+the remaining provisions continue in full force and effect.
+
+────────────────────────────────────────────────────────────
+15. ENTIRE AGREEMENT
+────────────────────────────────────────────────────────────
+This Agreement, together with the LICENSE.txt and
+WARRANTY_DISCLAIMER.txt, constitutes the entire agreement
+between you and Archer Chain Analytics™ regarding AcerbE™.
+
+It supersedes all prior representations, communications,
+and agreements.
+
+────────────────────────────────────────────────────────────
+16. ACCEPTANCE
+────────────────────────────────────────────────────────────
+Installation, access, or use of AcerbE™ constitutes your
+unconditional acceptance of this Agreement.
+
+If you do not agree to all terms, do not install or use
+AcerbE™. Return it to the point of purchase for a refund
+in accordance with the seller's refund policy.
+
+────────────────────────────────────────────────────────────
+© Archer Chain Analytics™ — All Rights Reserved.
+Sovereign. Zero-Trust. Zero Compromise.
+────────────────────────────────────────────────────────────
