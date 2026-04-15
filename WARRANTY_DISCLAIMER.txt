@@ -1,0 +1,92 @@
+AcerbE™ Warranty and Liability Disclaimer
+Archer Chain Analytics™
+Mahihkan.com
+CRA BN: 754975035 | GST/HST: 754975035 RT0001
+Saskatoon, Saskatchewan, Canada
+
+────────────────────────────────────────────────────────────
+1. NO WARRANTY
+────────────────────────────────────────────────────────────
+AcerbE™ is provided AS IS and AS AVAILABLE.
+
+Archer Chain Analytics™ makes no warranties — express,
+implied, or statutory — including but not limited to:
+
+- Fitness for a particular purpose
+- Merchantability
+- Non-infringement
+- Accuracy or completeness of outputs
+- Uninterrupted or error-free operation
+
+────────────────────────────────────────────────────────────
+2. OPERATIONAL RISK
+────────────────────────────────────────────────────────────
+AcerbE™ performs deterministic integrity analysis based on
+inputs you provide.
+
+You acknowledge:
+
+- Suitability for your operational, legal, or compliance
+  requirements is your determination alone.
+- No guarantee is made that AcerbE™ will detect all forms
+  of tampering, corruption, or unauthorized modification.
+- Outputs are verification artifacts, not legal certifications.
+
+────────────────────────────────────────────────────────────
+3. LIMITATION OF LIABILITY
+────────────────────────────────────────────────────────────
+To the fullest extent permitted by applicable law:
+
+Archer Chain Analytics™ is not liable for:
+
+- Direct, indirect, incidental, or consequential damages
+- Loss of revenue, data, or business operations
+- Reputational harm
+- Legal costs arising from use or misuse of AcerbE™
+
+This limitation applies regardless of the form of action
+and even if Archer Chain Analytics™ has been advised of
+the possibility of such damages.
+
+────────────────────────────────────────────────────────────
+4. USER RESPONSIBILITY
+────────────────────────────────────────────────────────────
+You are solely responsible for:
+
+- Lawful use of AcerbE™
+- Maintenance of backups
+- Implementation of appropriate security controls
+- Interpretation and application of AcerbE™ outputs
+- Compliance with all applicable laws and regulations
+
+────────────────────────────────────────────────────────────
+5. NO LEGAL OR REGULATORY CERTIFICATION
+────────────────────────────────────────────────────────────
+AcerbE™ assists with integrity verification.
+
+AcerbE™ does not constitute:
+
+- Legal advice
+- Compliance certification
+- Regulatory approval
+- Forensic certification recognized by any court or body
+
+Engage qualified legal counsel for legal determinations.
+
+────────────────────────────────────────────────────────────
+6. GOVERNING LAW
+────────────────────────────────────────────────────────────
+This Disclaimer is governed by the laws of the Province of
+Saskatchewan and the federal laws of Canada applicable
+therein.
+
+────────────────────────────────────────────────────────────
+7. ACCEPTANCE
+────────────────────────────────────────────────────────────
+Use of AcerbE™ constitutes acceptance of this Disclaimer
+in full.
+
+────────────────────────────────────────────────────────────
+© Archer Chain Analytics™ — All Rights Reserved.
+Sovereign. Zero-Trust. Zero Compromise.
+────────────────────────────────────────────────────────────
