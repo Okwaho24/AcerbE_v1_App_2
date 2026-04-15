@@ -1,0 +1,132 @@
+AcerbE™ Compliance Disclosure
+Archer Chain Analytics™
+Mahihkan.com
+CRA BN: 754975035 | GST/HST: 754975035 RT0001
+Saskatoon, Saskatchewan, Canada
+
+────────────────────────────────────────────────────────────
+1. PURPOSE
+────────────────────────────────────────────────────────────
+This disclosure defines what AcerbE™ is, what it does, and
+what it does not do.
+
+It is provided to protect buyers, operators, and Archer
+Chain Analytics™ from false claims, misrepresentation,
+and misuse.
+
+────────────────────────────────────────────────────────────
+2. OPERATIONAL SCOPE
+────────────────────────────────────────────────────────────
+AcerbE™ is a local-only digital fingerprinting and
+integrity-verification engine.
+
+AcerbE™ operates entirely on your local system.
+AcerbE™ does not require internet connectivity.
+AcerbE™ does not connect to any external server.
+
+────────────────────────────────────────────────────────────
+3. CRYPTOGRAPHIC FINGERPRINTING
+────────────────────────────────────────────────────────────
+AcerbE™ embeds unique cryptographic fingerprints into
+digital product files at point of sale.
+
+Fingerprinting method:
+
+- Layer 1: Format-specific steganographic embedding
+  (LSB pixel injection for images, XMP metadata for PDF,
+  trailing-byte injection for audio, manifest embedding
+  for ZIP archives).
+- Layer 2: AES-256-CBC encryption with PBKDF2-derived keys
+  unique to each buyer-transaction combination.
+- Layer 3: HMAC-SHA256 tamper-guard wrapper. Any
+  unauthorized modification invalidates the HMAC and
+  renders the file non-functional.
+- Layer 4: Encrypted local registry logging all issued
+  fingerprints with buyer identity, transaction ID,
+  product ID, and timestamp.
+
+────────────────────────────────────────────────────────────
+4. NO DRM LOCKOUT
+────────────────────────────────────────────────────────────
+AcerbE™ does not implement remote DRM lockout.
+
+AcerbE™ does not:
+
+- Revoke access to files remotely.
+- Require activation, license validation, or server
+  check-in.
+- Prevent access based on network connectivity.
+- Expire or deactivate files on a schedule.
+
+────────────────────────────────────────────────────────────
+5. NO SPYWARE
+────────────────────────────────────────────────────────────
+AcerbE™ contains no spyware.
+
+AcerbE™ does not:
+
+- Monitor user behavior or activity.
+- Capture keystrokes, screen data, or file access.
+- Access files outside of those explicitly submitted to
+  AcerbE™ by the operator.
+- Report any data to any external party.
+
+────────────────────────────────────────────────────────────
+6. NO TRACKING
+────────────────────────────────────────────────────────────
+AcerbE™ does not track users, buyers, or operators.
+
+Fingerprint records stored in the local Registry are
+accessible only to the operator on the local system.
+
+No tracking data is transmitted, aggregated, or reported
+externally.
+
+────────────────────────────────────────────────────────────
+7. OPEN-SOURCE DEPENDENCIES
+────────────────────────────────────────────────────────────
+AcerbE™ uses the following open-source libraries:
+
+- Pillow — Python Imaging Library (LGPL)
+- cryptography — Cryptographic primitives (Apache 2.0 / BSD)
+- pikepdf — PDF processing (MPL 2.0)
+
+All dependencies operate locally.
+Full SBOM is provided in SBOM.txt.
+
+────────────────────────────────────────────────────────────
+8. OUTPUT LIMITATIONS
+────────────────────────────────────────────────────────────
+AcerbE™ Outputs are integrity verification artifacts.
+
+AcerbE™ Outputs:
+
+- Are not legal certifications.
+- Are not court-admissible forensic evidence without
+  independent expert verification.
+- Are not regulatory approvals or compliance certificates.
+
+Operators are responsible for the appropriate application
+and interpretation of all Outputs.
+
+────────────────────────────────────────────────────────────
+9. INTENDED USE
+────────────────────────────────────────────────────────────
+AcerbE™ is intended for:
+
+- Digital product creators protecting their IP.
+- Publishers, developers, and creators tracking
+  unauthorized distribution.
+- Operators requiring audit-ready provenance records
+  for digital product sales.
+
+AcerbE™ is not intended for:
+
+- Surveillance of individuals.
+- Circumvention of lawful rights.
+- Any unlawful purpose.
+
+────────────────────────────────────────────────────────────
+© Archer Chain Analytics™ — All Rights Reserved.
+Sovereign. Zero-Trust. Zero Compromise.
+────────────────────────────────────────────────────────────
