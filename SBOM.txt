@@ -1,0 +1,134 @@
+AcerbE™ Software Bill of Materials (SBOM)
+Archer Chain Analytics™
+Mahihkan.com
+CRA BN: 754975035 | GST/HST: 754975035 RT0001
+Saskatoon, Saskatchewan, Canada
+
+SBOM Version: 1.0
+AcerbE™ Version: 1.0
+Format: SPDX-inspired plain text
+Date: 2024
+
+────────────────────────────────────────────────────────────
+1. PRIMARY COMPONENT
+────────────────────────────────────────────────────────────
+Name:             AcerbE™
+Version:          1.0
+Supplier:         Archer Chain Analytics™
+License:          Proprietary — See LICENSE.txt
+Copyright:        © Archer Chain Analytics™. All rights reserved.
+Classification:   Forensic Integrity Engine
+
+────────────────────────────────────────────────────────────
+2. RUNTIME DEPENDENCY — Python
+────────────────────────────────────────────────────────────
+Name:             Python
+Version:          3.9 or higher (3.12 recommended)
+Supplier:         Python Software Foundation
+Source:           https://python.org
+License:          PSF License (open source, permissive)
+Purpose:          Runtime environment
+Transmission:     None. Local execution only.
+
+────────────────────────────────────────────────────────────
+3. DEPENDENCY — Pillow
+────────────────────────────────────────────────────────────
+Name:             Pillow
+Version:          10.x (latest stable)
+Supplier:         Alex Clark and Contributors
+Source:           https://pypi.org/project/Pillow/
+License:          HPND (Historical Permission Notice and Disclaimer)
+Purpose:          Image processing — LSB steganographic embedding
+                  for PNG, JPG, WEBP, BMP formats.
+Transmission:     None. Local execution only.
+Data Access:      Image files explicitly submitted by operator.
+
+────────────────────────────────────────────────────────────
+4. DEPENDENCY — cryptography
+────────────────────────────────────────────────────────────
+Name:             cryptography
+Version:          41.x or higher (latest stable)
+Supplier:         Python Cryptographic Authority (PyCA)
+Source:           https://pypi.org/project/cryptography/
+License:          Apache License 2.0 / BSD License
+Purpose:          AES-256-CBC encryption, PBKDF2 key derivation,
+                  HMAC-SHA256 tamper verification.
+Transmission:     None. Local execution only.
+Data Access:      Data explicitly submitted to the engine.
+
+────────────────────────────────────────────────────────────
+5. DEPENDENCY — pikepdf
+────────────────────────────────────────────────────────────
+Name:             pikepdf
+Version:          8.x or higher (latest stable)
+Supplier:         James R. Barlow and Contributors
+Source:           https://pypi.org/project/pikepdf/
+License:          Mozilla Public License 2.0 (MPL 2.0)
+Purpose:          PDF XMP metadata embedding for fingerprint
+                  injection into PDF format products.
+Transmission:     None. Local execution only.
+Data Access:      PDF files explicitly submitted by operator.
+
+────────────────────────────────────────────────────────────
+6. STANDARD LIBRARY COMPONENTS
+────────────────────────────────────────────────────────────
+The following Python standard library modules are used.
+These are part of the Python runtime and carry the PSF License.
+
+- os          — File system operations
+- sys         — System interface
+- json        — Data serialization
+- uuid        — Fingerprint ID generation
+- hmac        — HMAC computation
+- hashlib     — SHA-256 hashing
+- struct      — Binary data packing
+- zipfile     — ZIP archive processing
+- shutil      — File operations
+- sqlite3     — Local registry database
+- tempfile    — Temporary file management
+- datetime    — Timestamp generation
+- pathlib     — Path handling
+- threading   — Server threading
+- webbrowser  — Browser launch on startup
+- http.server — Local HTTP server (dashboard bridge)
+- urllib.parse — URL parsing
+
+────────────────────────────────────────────────────────────
+7. EXTERNAL SERVICES
+────────────────────────────────────────────────────────────
+None.
+
+AcerbE™ does not call any external API, service, or server.
+All operations are local.
+
+────────────────────────────────────────────────────────────
+8. DATA STORES
+────────────────────────────────────────────────────────────
+Name:             acerbe_registry.db
+Type:             SQLite3 database
+Location:         Local system — operator-controlled directory
+Contents:         Fingerprint records, buyer identifiers,
+                  transaction IDs, product IDs, timestamps,
+                  HMAC seals.
+Transmission:     None. Never transmitted externally.
+Access Control:   Operator responsibility.
+
+────────────────────────────────────────────────────────────
+9. KNOWN VULNERABILITIES
+────────────────────────────────────────────────────────────
+No known critical vulnerabilities in AcerbE™ v1.0 at
+time of release.
+
+Operators are responsible for keeping Python and all
+dependencies updated to current stable releases.
+
+────────────────────────────────────────────────────────────
+10. INTEGRITY VERIFICATION
+────────────────────────────────────────────────────────────
+SHA-256 checksums for AcerbE™ v1.0 distribution files
+are provided separately in CHECKSUMS.txt upon request.
+
+────────────────────────────────────────────────────────────
+© Archer Chain Analytics™ — All Rights Reserved.
+Sovereign. Zero-Trust. Zero Compromise.
+────────────────────────────────────────────────────────────
