@@ -1,0 +1,26 @@
+{
+  "name": "acerbe_repo",
+  "version": "1.0.0",
+  "description": "> **NOTICE: PRIVATE AND PROPRIETARY PROPERTY OF ARCHER CHAIN ANALYTICS** >  > This repository contains confidential and proprietary information.  > Access is restricted to authorized personnel only.  > Copyright © 2026 Archer Chain Analytics. >  # AcerbE™ — Forensic Mark Engine ### AcerbE™ Forensic Mark Engine · v3.1.0-reconciled",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Okwaho24/AcerbE_v1_App_2.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Okwaho24/AcerbE_v1_App_2/issues"
+  },
+  "homepage": "https://github.com/Okwaho24/AcerbE_v1_App_2#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "multer": "^2.4.0"
+  }
+}
