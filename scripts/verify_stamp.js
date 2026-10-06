@@ -2,15 +2,25 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-// Zero Trust: Enforce strict environment variables for signing keys
 const CONFIG = {
     secretKey: process.env.ACERBE_SIGNING_KEY || (() => { throw new Error('FATAL: ACERBE_SIGNING_KEY environment variable is required.'); })(),
     stampsDir: path.join(__dirname, '..', 'data', 'stamps')
 };
 
+function logNdjson(level, event, data = {}) {
+    const record = {
+        level,
+        timestamp: new Date().toISOString(),
+        component: 'stamp_verifier',
+        event,
+        ...data
+    };
+    console.log(JSON.stringify(record));
+}
+
 function verifyStamp(stampPath) {
     if (!fs.existsSync(stampPath)) {
-        console.error(`[✖] Stamp file not found: ${stampPath}`);
+        logNdjson('ERROR', 'stamp_not_found', { path: stampPath });
         return false;
     }
 
@@ -18,8 +28,8 @@ function verifyStamp(stampPath) {
         const rawData = fs.readFileSync(stampPath, 'utf8');
         const stamp = JSON.parse(rawData);
 
-        if (!stamp.txId || !stamp.signature || !stamp.payloadHash) {
-            console.error(`[!] Invalid stamp schema for file: ${stampPath}`);
+        if (!stamp.txId || !stamp.nonce || !stamp.signature || !stamp.payloadHash) {
+            logNdjson('ERROR', 'invalid_stamp_schema', { path: stampPath });
             return false;
         }
 
@@ -31,13 +41,14 @@ function verifyStamp(stampPath) {
             .digest('hex');
 
         if (recomputedPayloadHash !== stamp.payloadHash) {
-            console.error(`[!] TAMPER DETECTED: Payload hash mismatch for ${stamp.txId}`);
+            logNdjson('CRITICAL', 'tamper_detected_payload_mismatch', { txId: stamp.txId });
             return false;
         }
 
-        // 2. Reconstruct signed data and verify HMAC signature using timing-safe comparison
+        // 2. Reconstruct signed data including nonce and verify HMAC signature
         const dataToSign = JSON.stringify({
             txId: stamp.txId,
+            nonce: stamp.nonce,
             payload: stamp.payload,
             timestamp: stamp.timestamp
         });
@@ -51,27 +62,27 @@ function verifyStamp(stampPath) {
         const expectedBuffer = Buffer.from(expectedSignature, 'hex');
 
         if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
-            console.error(`[!] TAMPER DETECTED: Cryptographic signature verification failed for ${stamp.txId}`);
+            logNdjson('CRITICAL', 'tamper_detected_signature_mismatch', { txId: stamp.txId });
             return false;
         }
 
-        console.log(`[✔] VERIFIED: Stamp integrity valid for TX: ${stamp.txId}`);
+        logNdjson('INFO', 'stamp_verified', { txId: stamp.txId, nonce: stamp.nonce });
         return true;
     } catch (err) {
-        console.error(`[!] Verification error for ${stampPath}: ${err.message}`);
+        logNdjson('ERROR', 'verification_error', { path: stampPath, error: err.message });
         return false;
     }
 }
 
 function verifyAllStamps() {
     if (!fs.existsSync(CONFIG.stampsDir)) {
-        console.log(`[*] No stamps directory found at ${CONFIG.stampsDir}`);
+        logNdjson('WARN', 'stamps_dir_missing', { path: CONFIG.stampsDir });
         return;
     }
 
     const files = fs.readdirSync(CONFIG.stampsDir).filter(f => f.endsWith('.json'));
     if (files.length === 0) {
-        console.log('[*] No forensic stamp artifacts found to verify.');
+        logNdjson('INFO', 'no_stamps_found', {});
         return;
     }
 
@@ -83,14 +94,14 @@ function verifyAllStamps() {
     }
 
     if (allValid) {
-        console.log('[✔] All forensic stamp artifacts successfully verified and untampered.');
+        logNdjson('INFO', 'all_stamps_verified', { count: files.length });
     } else {
-        console.error('[✖] Integrity check failed for one or more stamps.');
+        logNdjson('CRITICAL', 'integrity_check_failed', {});
         process.exit(1);
     }
 }
 
 if (require.main === module) {
-    console.log('[*] Running AcerbE Forensic Stamp Verification Suite...');
+    logNdjson('INFO', 'verifier_started', {});
     verifyAllStamps();
 }

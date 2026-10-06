@@ -8,6 +8,17 @@ const CONFIG = {
     stampsDir: path.join(__dirname, '..', 'data', 'stamps')
 };
 
+function logNdjson(level, event, data = {}) {
+    const record = {
+        level,
+        timestamp: new Date().toISOString(),
+        component: 'crypto_stamper',
+        event,
+        ...data
+    };
+    console.log(JSON.stringify(record));
+}
+
 function ensureStampsDirectory() {
     if (!fs.existsSync(CONFIG.stampsDir)) {
         fs.mkdirSync(CONFIG.stampsDir, { recursive: true, mode: 0o700 });
@@ -18,18 +29,21 @@ function generateCryptographicStamp(txId, payload) {
     ensureStampsDirectory();
     
     const timestamp = new Date().toISOString();
+    const nonce = crypto.randomUUID();
     const payloadHash = crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex');
     
-    const dataToSign = JSON.stringify({ txId, payload, timestamp });
+    // Bind txId, nonce, payload, and timestamp into cryptographic signature
+    const dataToSign = JSON.stringify({ txId, nonce, payload, timestamp });
     const signature = crypto
         .createHmac('sha256', CONFIG.secretKey)
         .update(dataToSign)
         .digest('hex');
 
     const stampArtifact = {
-        version: "3.1.0",
+        version: "3.2.0",
         engine: "AcerbE-Forensic-Stamper",
         txId,
+        nonce,
         timestamp,
         payload,
         payloadHash,
@@ -37,13 +51,18 @@ function generateCryptographicStamp(txId, payload) {
     };
 
     const stampPath = path.join(CONFIG.stampsDir, `${txId}.json`);
-    fs.writeFileSync(stampPath, JSON.stringify(stampArtifact, null, 2), { mode: 0o600 });
-    console.log(`[✔] Generated cryptographic forensic stamp for TX: ${txId} -> ${stampPath}`);
+    const tempPath = `${stampPath}.tmp`;
+    
+    // Atomic write pattern to prevent partial writes / corruption on crash
+    fs.writeFileSync(tempPath, JSON.stringify(stampArtifact, null, 2), { mode: 0o600 });
+    fs.renameSync(tempPath, stampPath);
+    
+    logNdjson('INFO', 'stamp_generated', { txId, nonce, stampPath });
 }
 
 function processUnstampedFulfillments() {
     if (!fs.existsSync(CONFIG.fulfillmentLog)) {
-        console.log(`[*] No fulfillment log found at ${CONFIG.fulfillmentLog}`);
+        logNdjson('WARN', 'fulfillment_log_missing', { path: CONFIG.fulfillmentLog });
         return;
     }
 
@@ -58,16 +77,17 @@ function processUnstampedFulfillments() {
                 const payload = JSON.parse(match[2]);
                 const stampPath = path.join(CONFIG.stampsDir, `${txId}.json`);
 
-                // Regenerate if missing or outdated
-                generateCryptographicStamp(txId, payload);
+                if (!fs.existsSync(stampPath)) {
+                    generateCryptographicStamp(txId, payload);
+                }
             }
         } catch (err) {
-            console.error(`[!] Failed to process fulfillment line: ${err.message}`);
+            logNdjson('ERROR', 'fulfillment_parse_failed', { error: err.message, line });
         }
     });
 }
 
 if (require.main === module) {
-    console.log("[*] Running AcerbE Cryptographic Stamping Pipeline...");
+    logNdjson('INFO', 'stamper_started', {});
     processUnstampedFulfillments();
 }
