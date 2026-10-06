@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-// Zero Trust: Enforce strict environment variables for signing keys
 const CONFIG = {
     secretKey: process.env.ACERBE_SIGNING_KEY || (() => { throw new Error('FATAL: ACERBE_SIGNING_KEY environment variable is required.'); })(),
     fulfillmentLog: path.join(__dirname, '..', 'data', 'fulfillment.log'),
@@ -19,9 +18,9 @@ function generateCryptographicStamp(txId, payload) {
     ensureStampsDirectory();
     
     const timestamp = new Date().toISOString();
-    const dataToSign = JSON.stringify({ txId, payload, timestamp });
+    const payloadHash = crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex');
     
-    // Generate HMAC SHA-256 cryptographic signature
+    const dataToSign = JSON.stringify({ txId, payload, timestamp });
     const signature = crypto
         .createHmac('sha256', CONFIG.secretKey)
         .update(dataToSign)
@@ -32,7 +31,8 @@ function generateCryptographicStamp(txId, payload) {
         engine: "AcerbE-Forensic-Stamper",
         txId,
         timestamp,
-        payloadHash: crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex'),
+        payload,
+        payloadHash,
         signature
     };
 
@@ -52,16 +52,14 @@ function processUnstampedFulfillments() {
 
     lines.forEach(line => {
         try {
-            // Match log format: [TIMESTAMP] TX_CONFIRMED: ID | PAYLOAD: {...}
             const match = line.match(/TX_CONFIRMED:\s+([^\s]+)\s+\|\s+PAYLOAD:\s+(.+)/);
             if (match) {
                 const txId = match[1];
                 const payload = JSON.parse(match[2]);
                 const stampPath = path.join(CONFIG.stampsDir, `${txId}.json`);
 
-                if (!fs.existsSync(stampPath)) {
-                    generateCryptographicStamp(txId, payload);
-                }
+                // Regenerate if missing or outdated
+                generateCryptographicStamp(txId, payload);
             }
         } catch (err) {
             console.error(`[!] Failed to process fulfillment line: ${err.message}`);
