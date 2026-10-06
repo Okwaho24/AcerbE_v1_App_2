@@ -42,3 +42,7 @@ node_modules/
 tests/output/
 logs/
 .DS_Store
+
+# Pipeline compiled and rendered build artifacts
+**/compiled.md
+**/rendered_output.md
