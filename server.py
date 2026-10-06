@@ -108,8 +108,10 @@ class AcerbEHandler(BaseHTTPRequestHandler):
             try:
                 body = json.loads(raw_body)
                 file_path = body.get("file_path", "").strip()
-                buyer_name = body.get("buyer_name", "").strip()
-                buyer_email = body.get("buyer_email", "").strip()
+                # Accept either buyer_wallet (RaPaX contract) or buyer_name/buyer_email (legacy)
+                buyer_wallet  = body.get("buyer_wallet", "").strip()
+                buyer_name    = body.get("buyer_name",  buyer_wallet or "").strip()
+                buyer_email   = body.get("buyer_email", buyer_wallet or "").strip()
                 transaction_id = body.get("transaction_id", "").strip()
                 product_id = body.get("product_id", "").strip()
                 product_name = body.get("product_name", "Unknown").strip()
