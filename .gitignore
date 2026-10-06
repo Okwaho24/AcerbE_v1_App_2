@@ -37,3 +37,8 @@ Thumbs.db
 .idea/
 *.swp
 tests/output/
+node_modules/
+node_modules/
+tests/output/
+logs/
+.DS_Store
