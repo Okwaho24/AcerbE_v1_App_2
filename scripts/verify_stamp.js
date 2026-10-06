@@ -18,10 +18,16 @@ function verifyStamp(stampPath) {
         const rawData = fs.readFileSync(stampPath, 'utf8');
         const stamp = JSON.parse(rawData);
 
-        // 1. Verify payload hash integrity
+        if (!stamp.txId || !stamp.signature || !stamp.payloadHash) {
+            console.error(`[!] Invalid stamp schema for file: ${stampPath}`);
+            return false;
+        }
+
+        // 1. Verify payload hash integrity safely
+        const payloadContent = stamp.payload !== undefined ? JSON.stringify(stamp.payload) : "";
         const recomputedPayloadHash = crypto
             .createHash('sha256')
-            .update(JSON.stringify(stamp.payload))
+            .update(payloadContent)
             .digest('hex');
 
         if (recomputedPayloadHash !== stamp.payloadHash) {
