@@ -4,8 +4,8 @@
 > Access is restricted to authorized personnel only. 
 > Copyright © 2026 Archer Chain Analytics.
 > 
-# AcerbE™ — Digital Fingerprinter
-### Military-Grade Forensic Watermarking Engine · v1.0
+# AcerbE™ — Forensic Mark Engine
+### AcerbE™ Forensic Mark Engine · v3.1.0-reconciled
 
 ---
 
@@ -21,10 +21,10 @@ identify exactly who bought it, when, and via which transaction — by scanning 
 
 | Layer | Method | Purpose |
 |-------|--------|---------|
-| 1 · Steganography | LSB pixel injection (images), XMP metadata (PDF), trailing bytes (audio), manifest + inner marking (ZIP) | Invisible embedding — undetectable to the eye/ear |
-| 2 · Crypto Binding | AES-256-CBC + PBKDF2-derived key, unique per buyer+transaction | No two buyers share a key. Mathematically unbreakable. |
-| 3 · Tamper Guard | HMAC-SHA256 wrapper over full encrypted content | Any modification = HMAC fail = zero-byte unusable output |
-| 4 · Forensic Registry | Encrypted SQLite DB with HMAC-sealed records | 100% traceable: name, email, transaction ID, timestamp |
+| 1 · Steganography | LSB pixel injection (images), XMP+GPM (PDF), zero-width Unicode (text/md), free-atom (MP4), comment injection (code), part injection (OOXML) | Invisible in-band embedding |
+| 2 · Crypto Binding | AES-256-CBC + PBKDF2-derived key, unique per buyer+transaction | No two buyers share a key |
+| 3 · Manifest Integrity | HMAC-SHA256 sidecar `.manifest.json` | Any modification = HMAC fail = forensic alert |
+| 4 · Forensic Registry | HMAC-sealed SQLite records | Traceable: name, email, transaction ID, timestamp |
 
 ---
 
@@ -32,12 +32,13 @@ identify exactly who bought it, when, and via which transaction — by scanning 
 
 ```
 acerbe_engine/
-├── acerbe_engine.py   ← Core engine (all 4 layers)
-├── acerbe_cli.py             ← Command-line interface
-├── acerbe_integration.py     ← RaPaX™ vending machine plug-in
-├── test_fingerprinter.py    ← Full test suite (8/8 pass)
-├── dashboard.html           ← Standalone web dashboard
-└── README.md                ← This file
+├── acerbe_engine.py       ← Core engine — 26 formats, GPM PDF, HMAC registry (v3.1.0-reconciled)
+├── acerbe_cli.py          ← Command-line interface
+├── acerbe_integration.py  ← RaPaX™ vending machine plug-in
+├── server.py              ← HTTP server — /fingerprint (RaPaX) + /api/stamp|upload|scan
+├── test_acerbe_v3.py      ← Full test suite (18/18 pass)
+├── dashboard_live.html    ← Standalone web dashboard
+└── README.md              ← This file
 ```
 
 ---

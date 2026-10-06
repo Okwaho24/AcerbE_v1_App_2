@@ -4,19 +4,19 @@ Mahihkan.com
 CRA BN: 754975035 | GST/HST: 754975035 RT0001
 Saskatoon, Saskatchewan, Canada
 
-SBOM Version: 1.0
-AcerbE™ Version: 1.0
+SBOM Version: 2.0
+AcerbE™ Version: 3.1.0-reconciled
 Format: SPDX-inspired plain text
-Date: 2024
+Date: 2026-10-05
 
 ────────────────────────────────────────────────────────────
 1. PRIMARY COMPONENT
 ────────────────────────────────────────────────────────────
 Name:             AcerbE™
-Version:          1.0
-Supplier:         Archer Chain Analytics™
+Version:          3.1.0-reconciled
+Supplier:         Archer Chain Analytics™ (Sole Proprietor, Neil Scott Archer — ISC: 102237785)
 License:          Proprietary — See LICENSE.txt
-Copyright:        © Archer Chain Analytics™. All rights reserved.
+Copyright:        © 2026 Neil Scott Archer / Archer Chain Analytics™. All rights reserved.
 Classification:   Forensic Integrity Engine
 
 ────────────────────────────────────────────────────────────
