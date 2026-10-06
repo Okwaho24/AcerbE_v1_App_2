@@ -7,6 +7,7 @@ Validates stream manipulation and sub-point character spacing.
 import sys
 import os
 import json
+import unittest
 
 try:
     import pikepdf
@@ -33,62 +34,58 @@ def extract_raw_bytes(page):
         return contents.get_data()
     return b""
 
-def run_live_gpm_test():
-    print("=== Starting Live PDF GPM Embedder Test ===")
-    
-    input_pdf = "tests/output/live_sample_input.pdf"
-    output_pdf = "tests/output/live_sample_gpm_marked.pdf"
-    os.makedirs("tests/output", exist_ok=True)
+class TestLiveGPM(unittest.TestCase):
 
-    if HAS_PIKEPDF:
-        pdf = pikepdf.Pdf.new()
-        for i in range(3):
-            page = pdf.add_blank_page(page_size=(612, 792))
-            stream_data = f"BT /F1 12 Tf 72 700 Td (AcerbE GPM Test Page {i+1}) Tj ET".encode('utf-8')
-            page.set_contents(pdf.make_stream(stream_data))
-        pdf.save(input_pdf)
-        pdf.close()
-    else:
-        writer = pypdf.PdfWriter()
-        for i in range(3):
-            page = writer.add_blank_page(width=612, height=792)
-            stream = pypdf.generic.DecodedStreamObject()
-            stream.set_data(f"BT /F1 12 Tf 72 700 Td (AcerbE GPM Test Page {i+1}) Tj ET".encode('utf-8'))
-            page[pypdf.generic.NameObject("/Contents")] = stream
-        with open(input_pdf, "wb") as f_out:
-            writer.write(f_out)
+    def test_live_gpm_watermarking(self):
+        input_pdf = "tests/output/live_sample_input.pdf"
+        output_pdf = "tests/output/live_sample_gpm_marked.pdf"
+        os.makedirs("tests/output", exist_ok=True)
 
-    print(f"[+] Generated 3-page target PDF fixture: {input_pdf}")
+        if HAS_PIKEPDF:
+            pdf = pikepdf.Pdf.new()
+            for i in range(3):
+                page = pdf.add_blank_page(page_size=(612, 792))
+                stream_data = f"BT /F1 12 Tf 72 700 Td (AcerbE GPM Test Page {i+1}) Tj ET".encode('utf-8')
+                page.set_contents(pdf.make_stream(stream_data))
+            pdf.save(input_pdf)
+            pdf.close()
+        else:
+            writer = pypdf.PdfWriter()
+            for i in range(3):
+                page = writer.add_blank_page(width=612, height=792)
+                stream = pypdf.generic.DecodedStreamObject()
+                stream.set_data(f"BT /F1 12 Tf 72 700 Td (AcerbE GPM Test Page {i+1}) Tj ET".encode('utf-8'))
+                page[pypdf.generic.NameObject("/Contents")] = stream
+            with open(input_pdf, "wb") as f_out:
+                writer.write(f_out)
 
-    secret_key = os.environ.get("ACERBE_SECRET_KEY", "f" * 64)
-    payload = {
-        "txid": "TX-GPM-LIVE-2026-X",
-        "email": "verification@mahihkan.com",
-        "product_id": "PROD-EBOOK-001"
-    }
+        self.assertTrue(os.path.exists(input_pdf))
 
-    print("[+] Invoking embed_pdf_watermark (Glyph Positional Modulation)...")
-    res = embed_pdf_watermark(input_pdf, output_pdf, payload, secret_key)
-    print("[✔] Embedding result:", json.dumps(res, indent=2))
+        secret_key = os.environ.get("ACERBE_SECRET_KEY", "f" * 64)
+        payload = {
+            "txid": "TX-GPM-LIVE-2026-X",
+            "email": "verification@mahihkan.com",
+            "product_id": "PROD-EBOOK-001"
+        }
 
-    reader = pikepdf.Pdf.open(output_pdf) if HAS_PIKEPDF else pypdf.PdfReader(output_pdf)
-    pages = reader.pages
+        res = embed_pdf_watermark(input_pdf, output_pdf, payload, secret_key)
+        self.assertEqual(res["status"], "SUCCESS")
+        self.assertEqual(res["modified_pages"], 3)
+        self.assertTrue(os.path.exists(output_pdf))
 
-    tc_operator_found = False
-    for idx, page in enumerate(pages):
-        raw_bytes = extract_raw_bytes(page)
-        if b"Tc" in raw_bytes:
-            tc_operator_found = True
-            print(f"[✔] Confirmed 'Tc' operator injection on Page {idx + 1}")
+        reader = pikepdf.Pdf.open(output_pdf) if HAS_PIKEPDF else pypdf.PdfReader(output_pdf)
+        pages = reader.pages
 
-    if HAS_PIKEPDF:
-        reader.close()
+        tc_operator_found = False
+        for page in pages:
+            raw_bytes = extract_raw_bytes(page)
+            if b"Tc" in raw_bytes:
+                tc_operator_found = True
 
-    if not tc_operator_found:
-        print("[-] FAIL: 'Tc' character spacing operator not found in output content streams.")
-        sys.exit(1)
+        if HAS_PIKEPDF:
+            reader.close()
 
-    print("=== Live GPM Embedder Test PASSED ===")
+        self.assertTrue(tc_operator_found, "'Tc' character spacing operator missing from content streams.")
 
 if __name__ == "__main__":
-    run_live_gpm_test()
+    unittest.main()
