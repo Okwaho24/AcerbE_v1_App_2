@@ -31,10 +31,16 @@ def embed_pdf_watermark(input_path, output_path, payload, secret_key):
     if HAS_PIKEPDF:
         pdf = pikepdf.Pdf.open(input_path)
         for page in pdf.pages:
-            contents = page.get_contents()
-            raw_bytes = contents.read_bytes() if contents else b""
+            contents = page.get("/Contents")
+            if contents is None:
+                pages_modified += 1
+                continue
+            if isinstance(contents, pikepdf.Array):
+                raw_bytes = b"".join(bytes(s.read_bytes()) for s in contents)
+            else:
+                raw_bytes = bytes(contents.read_bytes())
             modified_bytes = raw_bytes + b"\n0.01 Tc\n"
-            page.set_contents(pdf.make_stream(modified_bytes))
+            page["/Contents"] = pdf.make_stream(modified_bytes)
             pages_modified += 1
         pdf.save(output_path)
         pdf.close()

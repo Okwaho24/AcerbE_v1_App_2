@@ -1,1 +1,103 @@
-const express = require("express"); const multer = require("multer"); const { spawnSync } = require("child_process"); const fs = require("fs"); const path = require("path"); const app = express(); const upload = multer({ dest: "tests/output/" }); const PORT = process.env.PORT || 8000; const API_BEARER_TOKEN = process.env.ACERBE_API_TOKEN || "acerbe_secret_bearer_token_change_me"; const authenticateToken = (req, res, next) => { const token = req.headers["authorization"]?.split(" ")[1]; if (!token || token !== API_BEARER_TOKEN) return res.status(401).json({ error: "Unauthorized" }); next(); }; app.post("/api/v1/watermark", authenticateToken, upload.single("file"), (req, res) => { if (!req.file) return res.status(400).json({ error: "No file" }); const inputPath = req.file.path; const outputPath = inputPath + "_stamped.pdf"; const payload = req.body.payload || "ACERB-AUDIT-2026"; const secretKey = process.env.ACERBE_SECRET_KEY || "default_secret"; const pyScript = "from core.engine import embed_pdf_watermark; embed_pdf_watermark('" + inputPath + "', '" + outputPath + "', '" + payload + "', '" + secretKey + "')"; const result = spawnSync("python3", ["-c", pyScript]); if (result.status !== 0) { return res.status(500).json({ error: "Execution failed", details: result.stderr.toString() }); } const manifestPath = outputPath + ".manifest.json"; let manifest = fs.existsSync(manifestPath) ? JSON.parse(fs.readFileSync(manifestPath, "utf8")) : null; res.json({ status: "SUCCESS", output_pdf: outputPath, manifest: manifest }); }); app.get("/health", (req, res) => res.json({ status: "healthy" })); app.listen(PORT, () => console.log("API running on port " + PORT));
+/**
+ * AcerbE™ REST API — Forensic Watermark Endpoint
+ * Archer Chain Analytics™ | ISC: 102237785
+ * © 2026 Neil Scott Archer. All rights reserved.
+ */
+
+"use strict";
+
+const express  = require("express");
+const multer   = require("multer");
+const { spawn } = require("child_process");
+const fs       = require("fs");
+const path     = require("path");
+
+const app    = express();
+const upload = multer({ dest: "tests/output/" });
+const PORT   = process.env.PORT || 8000;
+
+const API_BEARER_TOKEN = process.env.ACERBE_API_TOKEN;
+if (!API_BEARER_TOKEN) {
+  process.stderr.write("CRITICAL: ACERBE_API_TOKEN not set — refusing to start\n");
+  process.exit(1);
+}
+
+// ── Auth middleware ────────────────────────────────────────────────────────────
+function authenticateToken(req, res, next) {
+  const auth  = req.headers["authorization"] || "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
+  if (!token || token !== API_BEARER_TOKEN) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  next();
+}
+
+// ── POST /api/v1/watermark ─────────────────────────────────────────────────────
+app.post(
+  "/api/v1/watermark",
+  authenticateToken,
+  upload.single("file"),
+  (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const inputPath  = req.file.path;
+    const outputPath = inputPath + "_stamped.pdf";
+
+    let payload;
+    try {
+      payload = req.body.payload ? JSON.parse(req.body.payload) : { audit: "ACERB-2026" };
+    } catch {
+      return res.status(400).json({ error: "Invalid payload JSON" });
+    }
+
+    const enginePath = path.resolve(__dirname, "../core/engine.py");
+    const args = [
+      enginePath,
+      "--action", "embed",
+      "--input",  inputPath,
+      "--output", outputPath,
+      "--payload", JSON.stringify(payload),
+    ];
+
+    const child = spawn("python3", args, {
+      env: { ...process.env },
+      shell: false,
+    });
+
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk) => { stdout += chunk.toString(); });
+    child.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
+
+    child.on("close", (code) => {
+      // Clean up temp upload regardless of outcome
+      try { fs.unlinkSync(inputPath); } catch { /* ignore */ }
+
+      if (code !== 0) {
+        return res.status(500).json({ error: "Engine failure", details: stderr });
+      }
+
+      let result;
+      try {
+        result = JSON.parse(stdout);
+      } catch {
+        return res.status(500).json({ error: "Unparseable engine output", raw: stdout });
+      }
+
+      const manifestPath = outputPath + ".manifest.json";
+      const manifest = fs.existsSync(manifestPath)
+        ? JSON.parse(fs.readFileSync(manifestPath, "utf8"))
+        : null;
+
+      res.json({ status: "SUCCESS", output_pdf: outputPath, manifest, engine: result });
+    });
+  }
+);
+
+// ── GET /health ────────────────────────────────────────────────────────────────
+app.get("/health", (_req, res) => res.json({ status: "healthy" }));
+
+// ── Start ──────────────────────────────────────────────────────────────────────
+app.listen(PORT);

@@ -22,9 +22,13 @@ from core.engine import embed_pdf_watermark
 def extract_raw_bytes(page):
     """Safely extracts raw content stream bytes across pikepdf and pypdf backends."""
     if HAS_PIKEPDF:
-        contents = page.get_contents()
-        return contents.read_bytes() if contents else b""
-    
+        contents = page.get("/Contents")
+        if contents is None:
+            return b""
+        if isinstance(contents, pikepdf.Array):
+            return b"".join(bytes(s.read_bytes()) for s in contents)
+        return bytes(contents.read_bytes())
+
     contents = page.get_contents()
     if contents is None:
         return b""
@@ -44,9 +48,17 @@ class TestLiveGPM(unittest.TestCase):
         if HAS_PIKEPDF:
             pdf = pikepdf.Pdf.new()
             for i in range(3):
-                page = pdf.add_blank_page(page_size=(612, 792))
-                stream_data = f"BT /F1 12 Tf 72 700 Td (AcerbE GPM Test Page {i+1}) Tj ET".encode('utf-8')
-                page.set_contents(pdf.make_stream(stream_data))
+                page = pikepdf.Page(
+                    pikepdf.Dictionary(
+                        Type=pikepdf.Name.Page,
+                        MediaBox=pikepdf.Array([0, 0, 612, 792]),
+                    )
+                )
+                stream_data = (
+                    f"BT /F1 12 Tf 72 700 Td (AcerbE GPM Test Page {i+1}) Tj ET"
+                ).encode("latin-1")
+                page.obj["/Contents"] = pdf.make_stream(stream_data)
+                pdf.pages.append(page)
             pdf.save(input_pdf)
             pdf.close()
         else:
